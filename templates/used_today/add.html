@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Log Usage - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 50px 30px;
+        border-radius: 20px;
+        margin-bottom: -50px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-card {
+        max-width: 700px;
+        margin: 0 auto 50px;
+        padding: 80px 40px 40px;
+        position: relative;
+        z-index: 0;
+    }
+
+    .form-floating>label {
+        padding-left: 20px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        padding: 1.1rem 1.25rem;
+        transition: all 0.3s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" data-aos="fade-up">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/used-today" class="btn btn-link text-decoration-none text-muted p-0 small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Usage Log
+            </a>
+        </div>
+    </div>
+
+    <div class="form-hero glass-card text-center shadow-lg">
+        <h1 class="fw-bold mb-2">Record <span class="text-white">Consumption</span></h1>
+        <p class="mb-0 opacity-75">Log products used or sold to complete the traceability chain.</p>
+    </div>
+
+    <div class="glass-card form-card shadow-lg">
+        <form method="POST">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="form-floating position-relative">
+                        <select class="form-select" id="exit_product_id" name="exit_product_id" required>
+                            <option value="">Choose an available batch</option>
+                            {% for product in available_products %}
+                            <option value="{{ product[0] }}">{{ product[1] }} - {{ product[2] }} units available
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <label for="exit_product_id">Select Product Batch *</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="quantity" name="quantity" required step="0.01"
+                            placeholder="Quantity">
+                        <label for="quantity">Quantity Used *</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="unit" name="unit" placeholder="Unit">
+                        <label for="unit">Unit (e.g., kg, pieces)</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="source_user" name="source_user"
+                            placeholder="Source">
+                        <label for="source_user">Provider / Source (Optional)</label>
+                        <i class="bi bi-shop position-absolute end-0 top-50 translate-middle-y me-3 text-muted"></i>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-5">
+                    <div class="d-grid shadow-sm">
+                        <button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold">
+                            <i class="bi bi-journal-plus me-2"></i> Log Final Usage
+                        </button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i> This marks the end of this
+                            product's chain in the system.</small>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

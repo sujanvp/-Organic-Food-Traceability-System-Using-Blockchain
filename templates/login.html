@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if request.path == '/register' %}Register{% else %}Login{% endif %} - Organic Traceability</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(0, 148, 50, 0.04);
+      border-radius: 50%;
+      top: -100px;
+      right: -100px;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(0, 148, 50, 0.03);
+      border-radius: 50%;
+      bottom: -50px;
+      left: 100px;
+      z-index: 0;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 25px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      width: 900px;
+      max-width: 100%;
+      min-height: 550px;
+      z-index: 1;
+    }
+
+    .form-container {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      transition: all 0.6s ease-in-out;
+      padding: 40px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .sign-in-container {
+      left: 0;
+      width: 50%;
+      z-index: 2;
+    }
+
+    .sign-up-container {
+      left: 0;
+      width: 50%;
+      opacity: 0;
+      z-index: 1;
+    }
+
+    .container.right-panel-active .sign-in-container {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+
+    .container.right-panel-active .sign-up-container {
+      transform: translateX(100%);
+      opacity: 1;
+      z-index: 5;
+      animation: show 0.6s;
+    }
+
+    @keyframes show {
+      0%, 49.99% { opacity: 0; z-index: 1; }
+      50%, 100% { opacity: 1; z-index: 5; }
+    }
+
+    .overlay-container {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+      transition: transform 0.6s ease-in-out;
+      z-index: 100;
+    }
+
+    .container.right-panel-active .overlay-container {
+      transform: translateX(-100%);
+    }
+
+    .overlay {
+      background: linear-gradient(135deg, #009432, #05c46b);
+      color: #fff;
+      position: relative;
+      left: -100%;
+      height: 100%;
+      width: 200%;
+      transform: translateX(0);
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .container.right-panel-active .overlay {
+      transform: translateX(50%);
+    }
+
+    .overlay-panel {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 0 40px;
+      text-align: center;
+      top: 0;
+      height: 100%;
+      width: 50%;
+      transform: translateX(0);
+      transition: transform 0.6s ease-in-out;
+    }
+
+    .overlay-left {
+      transform: translateX(-20%);
+    }
+
+    .container.right-panel-active .overlay-left {
+      transform: translateX(0);
+    }
+
+    .overlay-right {
+      right: 0;
+      transform: translateX(0);
+    }
+
+    .container.right-panel-active .overlay-right {
+      transform: translateX(20%);
+    }
+
+    .overlay-panel h2 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .overlay-panel p {
+      font-size: 14px;
+      margin-bottom: 30px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn-outline {
+      border: 2px solid white;
+      background: transparent;
+      color: white;
+      padding: 10px 40px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: #009432;
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    form h2 {
+      color: #009432;
+      font-size: 26px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      background: #fafafa;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: #009432;
+      background: #fff;
+    }
+
+    .btn-solid {
+      width: 100%;
+      padding: 12px;
+      background: #009432;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .btn-solid:hover {
+      background: #007a29;
+      transform: translateY(-2px);
+    }
+    
+    .alert {
+      background: #ff7675;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 13px;
+      width: 100%;
+    }
+
+    .mobile-toggle {
+      display: none;
+      margin-top: 15px;
+      text-align: center;
+      cursor: pointer;
+      color: #009432;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .overlay-container { display: none; }
+      .form-container { width: 100%; left: 0; transform: none; padding: 30px; }
+      .sign-in-container { opacity: 1; z-index: 5; }
+      .sign-up-container { opacity: 0; z-index: 1; display: none; }
+      .container.right-panel-active .sign-in-container { opacity: 0; z-index: 1; display: none; }
+      .container.right-panel-active .sign-up-container { opacity: 1; z-index: 5; display: flex; transform: none; }
+      .mobile-toggle { display: block; }
+    }
+    
+    /* circles inside overlay to maintain float animation */
+    @keyframes float1 { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-25px) rotate(5deg); } 100% { transform: translateY(0) rotate(0deg); } }
+    @keyframes float2 { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(20px) scale(1.05); } 100% { transform: translateY(0) scale(1); } }
+    .circle-1 { position: absolute; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; bottom: -100px; left: -100px; animation: float1 6s ease-in-out infinite; }
+    .circle-2 { position: absolute; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; top: -150px; right: -150px; animation: float2 8s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<div class="container {% if request.path == '/register' %}right-panel-active{% endif %}" id="container">
+  
+  <!-- SIGN UP FORM -->
+  <div class="form-container sign-up-container">
+    <form method="POST" action="/register">
+      <h2>Create account</h2>
+      {% if error and request.path == '/register' %}
+        <div class="alert">{{ error }}</div>
+      {% endif %}
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" name="name" placeholder="e.g. Ram" required>
+      </div>
+      <div class="form-group">
+        <label>Account Type</label>
+        <select name="role" required>
+          <option value="" disabled selected>Select your role...</option>
+          <option value="farmer">Farmer</option>
+          <option value="admin">Admin</option>
+          <option value="distributor">Distributor</option>
+          <option value="retailer">Retailer</option>
+          <option value="consumer">Consumer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="e.g. ram@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-solid">Sign up</button>
+      <p class="mobile-toggle" onclick="togglePanel()">Already have an account? Log in</p>
+    </form>
+  </div>
+
+  <!-- SIGN IN FORM -->
+  <div class="form-container sign-in-container">
+    <form method="POST" action="/login">
+      <h2>Log in</h2>
+      {% if error and request.path == '/login' %}
+        <div class="alert">{{ error }}</div>
+      {% endif %}
+      <div class="form-group">
+        <label>Account Type</label>
+        <select name="account_type" required>
+          <option value="" disabled selected>Select your role...</option>
+          <option value="farmer">Farmer</option>
+          <option value="admin">Admin</option>
+          <option value="distributor">Distributor</option>
+          <option value="retailer">Retailer</option>
+          <option value="consumer">Consumer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="e.g. ram@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-solid">Log in</button>
+      <p class="mobile-toggle" onclick="togglePanel()">Don't have an account? Sign up</p>
+    </form>
+  </div>
+
+  <!-- OVERLAY WITH ANIMATION PANELS -->
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="circle-1"></div>
+      <div class="circle-2"></div>
+      
+      <!-- Panel for Sign In mode (shows when Register form is visible) -->
+      <div class="overlay-panel overlay-left">
+        <h2>Welcome Back</h2>
+        <p>Already have an account? Log in to continue your secure trace.</p>
+        <button class="btn-outline" id="signInBtn">Log in</button>
+      </div>
+      
+      <!-- Panel for Sign Up mode (shows when Login form is visible) -->
+      <div class="overlay-panel overlay-right">
+        <h2>Get Started</h2>
+        <p>Don't have an account? Sign up to register your organic footprint.</p>
+        <button class="btn-outline" id="signUpBtn">Sign up</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const signUpButton = document.getElementById('signUpBtn');
+  const signInButton = document.getElementById('signInBtn');
+  const container = document.getElementById('container');
+
+  function togglePanel() {
+    container.classList.toggle("right-panel-active");
+    updateURL();
+  }
+
+  function updateURL() {
+    if(container.classList.contains("right-panel-active")) {
+      window.history.pushState({}, '', '/register');
+    } else {
+      window.history.pushState({}, '', '/login');
+    }
+  }
+
+  // Slide behavior for desktop overlay buttons
+  signUpButton.addEventListener('click', togglePanel);
+  signInButton.addEventListener('click', togglePanel);
+</script>
+
+</body>
+</html>

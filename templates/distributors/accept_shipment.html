@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Logistics Intake - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .selection-scroll {
+        max-height: 350px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .selection-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .selection-scroll::-webkit-scrollbar-thumb {
+        background: #eee;
+        border-radius: 10px;
+    }
+
+    .shipment-card {
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+        background: white;
+    }
+
+    .shipment-card:hover {
+        background: #fdfdfd;
+        transform: translateX(5px);
+    }
+
+    .shipment-card.active {
+        border-color: #2ecc71;
+        background: #f0fff4;
+    }
+
+    .step-number {
+        width: 30px;
+        height: 30px;
+        background: #2ecc71;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Selection Column -->
+    <div class="col-lg-5">
+        <div class="glass-card p-4 h-100 shadow-sm">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-number">1</div>
+                <h4 class="fw-bold mb-0">Select Outbound Load</h4>
+            </div>
+
+            <p class="text-muted small mb-4">Identify the batch ready for transport from the farm.</p>
+
+            <div class="selection-scroll">
+                {% if available_shipments %}
+                {% for item in available_shipments %}
+                <div class="shipment-card p-3 rounded-4 border mb-3 shadow-sm"
+                    onclick="selectShipment(this, {{ item[0] }}, '{{ item[1] }}')">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 text-dark">{{ item[1] }}</h6>
+                        <span class="badge bg-success-light text-success border rounded-pill px-2"
+                            style="font-size: 0.65rem;">Packaged</span>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        <i class="bi bi-box me-1"></i> Volume: {{ item[2] }} units | <i class="bi bi-building me-1"></i>
+                        {{ item[3] }}
+                    </div>
+                    <div class="small text-danger" style="font-size: 0.7rem;">
+                        <i class="bi bi-calendar-x me-1"></i> Best Before: {{ item[4] }}
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-truck-flatbed fs-1 text-muted opacity-25"></i>
+                    <p class="text-muted small mt-2">No loads currently awaiting pickup.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Column -->
+    <div class="col-lg-7">
+        <div class="glass-card p-4 h-100 shadow-sm" id="detailsSection" style="opacity: 0.5; pointer-events: none;">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-number">2</div>
+                <h4 class="fw-bold mb-0">Route & Logistics</h4>
+            </div>
+
+            <form id="acceptShipmentForm" onsubmit="submitShipment(event)">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="expected_delivery_date"
+                                name="expected_delivery_date" required>
+                            <label for="expected_delivery_date">Scheduled Delivery Date</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="origin_location" name="origin_location"
+                                placeholder="Origin" required>
+                            <label for="origin_location">Collection Point (Facility Address)</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="destination_location"
+                                name="destination_location" placeholder="Destination" required>
+                            <label for="destination_location">Delivery Endpoint (Retailer/Store)</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating mb-4">
+                            <textarea class="form-control" id="notes" name="notes" style="height: 100px"
+                                placeholder="Notes"></textarea>
+                            <label for="notes">Transit Special Instructions</label>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="exit_product_id" name="exit_product_id">
+                <input type="hidden" id="farmer_id" name="farmer_id" value="0">
+
+                <div class="d-grid gap-3 d-md-flex justify-content-md-end">
+                    <a href="/shipments" class="btn btn-light rounded-pill px-4 fw-bold">Discard</a>
+                    <button type="submit" class="btn btn-success rounded-pill px-5 py-3 fw-bold shadow-sm">
+                        Create Manifest & Update Blockchain <i class="bi bi-shield-check ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectShipment(element, exitProductId, productName) {
+        document.querySelectorAll('.shipment-card').forEach(c => c.classList.remove('active'));
+        element.classList.add('active');
+
+        document.getElementById('detailsSection').style.opacity = '1';
+        document.getElementById('detailsSection').style.pointerEvents = 'auto';
+
+        document.getElementById('exit_product_id').value = exitProductId;
+        // Highlight selected item in console for debug or similar if needed
+    }
+
+    function submitShipment(event) {
+        event.preventDefault();
+        const formData = new FormData(document.getElementById('acceptShipmentForm'));
+
+        fetch('/accept-shipment', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Logistics manifest initialized. Data appended to supply chain.');
+                    window.location.href = '/shipments';
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+    }
+</script>
+{% endblock %}

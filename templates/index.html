@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}OrganicTrace - Secure Food Supply Chain{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        padding: 80px 0;
+        position: relative;
+    }
+
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 25px;
+    }
+
+    .hero-image {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-image::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120%;
+        height: 120%;
+        background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+        z-index: -1;
+        opacity: 0.3;
+        filter: blur(40px);
+    }
+
+    .feature-card {
+        padding: 30px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 20px;
+        display: inline-block;
+    }
+
+    .stats-card {
+        background: var(--dark);
+        color: white;
+        padding: 60px 0;
+        border-radius: 40px;
+        margin-top: 50px;
+    }
+
+    .stat-val {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" data-aos="fade-up">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <span class="badge bg-primary-light text-primary rounded-pill px-3 py-2 mb-4">
+                <i class="bi bi-patch-check-fill me-2"></i>Blockchain Verified Traceability
+            </span>
+            <h1 class="hero-title">Transparent <span class="text-primary">Organic</span> Journey.</h1>
+            <p class="lead text-muted mb-5">
+                From farm to fork, we ensure 100% transparency using blockchain technology.
+                Track every step, verify every certification, and eat with confidence.
+            </p>
+            <div class="d-flex gap-3">
+                <a href="/register" class="btn btn-primary btn-lg px-4 py-3 shadow-lg">
+                    Get Started <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+                <a href="/track-food" class="btn btn-light btn-lg px-4 py-3 border">
+                    Trace Product <i class="bi bi-search ms-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6 mt-5 mt-lg-0">
+            <div class="hero-image text-center" data-aos="zoom-in" data-aos-delay="200">
+                <img src="https://img.freepik.com/free-vector/blockchain-technology-concept-illustration_114360-1011.jpg"
+                    alt="Blockchain Food" class="img-fluid rounded-4 shadow-sm" style="max-height: 450px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5 mt-5">
+    <div class="text-center mb-5" data-aos="fade-up">
+        <h2 class="fw-bold">How it Works</h2>
+        <p class="text-muted">A decentralized ledger for organic integrity.</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="glass-card feature-card">
+                <div class="feature-icon"><i class="bi bi-flower1"></i></div>
+                <h4 class="fw-bold">Farmers</h4>
+                <p class="text-muted">Log harvest details, soil quality, and organic certifications directly onto the
+                    ledger.</p>
+            </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="glass-card feature-card">
+                <div class="feature-icon"><i class="bi bi-cpu"></i></div>
+                <h4 class="fw-bold">Processors</h4>
+                <p class="text-muted">Record processing stages, batch numbers, and quality test results at every step.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="glass-card feature-card">
+                <div class="feature-icon"><i class="bi bi-people"></i></div>
+                <h4 class="fw-bold">Consumers</h4>
+                <p class="text-muted">Scan, search, and verify the entire history and authenticity of your organic food.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-card" data-aos="zoom-in">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stat-val">10k+</div>
+                <p class="mb-0 opacity-75">Verified Shipments</p>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-val">500+</div>
+                <p class="mb-0 opacity-75">Certified Farmers</p>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-val">100%</div>
+                <p class="mb-0 opacity-75">Transparency</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Exit Product - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        padding: 50px 30px;
+        border-radius: 20px;
+        margin-bottom: -50px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-card {
+        max-width: 700px;
+        margin: 0 auto 50px;
+        padding: 80px 40px 40px;
+        position: relative;
+        z-index: 0;
+    }
+
+    .form-floating>label {
+        padding-left: 20px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        padding: 1.1rem 1.25rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" data-aos="fade-up">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/exit-products" class="btn btn-link text-decoration-none text-muted p-0 small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Dispatch List
+            </a>
+        </div>
+    </div>
+
+    <div class="form-hero glass-card text-center shadow-lg">
+        <h1 class="fw-bold mb-2">Dispatch <span class="text-white">Assignment</span></h1>
+        <p class="mb-0 opacity-75">Assign verified batches to the next participant in the chain.</p>
+    </div>
+
+    <div class="glass-card form-card shadow-lg">
+        <form method="POST">
+            <div class="row g-4">
+                <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <select class="form-select" id="entry_product_id" name="entry_product_id" required>
+                            <option value="">Choose a product</option>
+                            {% for product in entry_products %}
+                            <option value="{{ product[0] }}">{{ product[1] }} - {{ product[2] }} units available
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <label for="entry_product_id">Source Product Batch *</label>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <select class="form-select" id="assigned_to_id" name="assigned_to_id" required>
+                            <option value="">Choose a receiver</option>
+                            {% for user in users %}
+                            <option value="{{ user[0] }}">{{ user[1] }} ({{ user[2] }})</option>
+                            {% endfor %}
+                        </select>
+                        <label for="assigned_to_id">Assign To (Stakeholder) *</label>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-5">
+                    <div class="d-grid shadow-sm">
+                        <button type="submit" class="btn btn-danger rounded-pill py-3 fw-bold">
+                            <i class="bi bi-send-check me-2"></i> Confirm Blockchain Dispatch
+                        </button>
+                    </div>
+                    <div class="bg-light p-3 rounded-4 mt-4 d-flex align-items-center gap-3">
+                        <i class="bi bi-shield-lock-fill text-danger fs-3"></i>
+                        <p class="small text-muted mb-0">This action will create a new block in the traceability ledger,
+                            permanently linking this batch to the receiver.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

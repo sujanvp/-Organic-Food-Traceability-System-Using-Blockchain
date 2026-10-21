@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Farmer Dashboard - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-banner::after {
+        content: '\F471';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 10rem;
+        opacity: 0.1;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .products-bg {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .entries-bg {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .exits-bg {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .quick-action-card {
+        padding: 24px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .quick-action-card i {
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    .hover-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="welcome-banner glass-card">
+            <h1 class="display-5 fw-bold mb-2">Welcome Back, {{ user[0] }}!</h1>
+            <p class="lead opacity-75">Your organic farm is contributing to a safer food supply chain. Here's your
+                harvest overview.</p>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="col-md-4">
+        <a href="/products" class="text-decoration-none text-dark d-block h-100">
+            <div class="glass-card p-4 h-100 hover-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon products-bg"><i class="bi bi-box-seam"></i></div>
+                <h5 class="text-muted mb-1">Products Listed</h5>
+                <h2 class="fw-bold d-inline-block">{{ stats.get('products', 0) }}</h2>
+                <div class="mt-3 text-success small fw-bold">View Details <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/entry-products" class="text-decoration-none text-dark d-block h-100">
+            <div class="glass-card p-4 h-100 hover-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon entries-bg"><i class="bi bi-arrow-down-circle"></i></div>
+                <h5 class="text-muted mb-1">Batch Entries</h5>
+                <h2 class="fw-bold d-inline-block">{{ stats.get('entries', 0) }}</h2>
+                <div class="mt-3 text-primary small fw-bold">View Details <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="/exit-products" class="text-decoration-none text-dark d-block h-100">
+            <div class="glass-card p-4 h-100 hover-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-icon exits-bg"><i class="bi bi-truck"></i></div>
+                <h5 class="text-muted mb-1">Total Shipped</h5>
+                <h2 class="fw-bold d-inline-block">{{ stats.get('exits', 0) }}</h2>
+                <div class="mt-3 text-purple small fw-bold" style="color: #7b1fa2;">View Details <i class="bi bi-arrow-right"></i></div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Chart & Activity -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100" data-aos="fade-right">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0">Production Analytics</h4>
+                <select class="form-select w-auto border-0 bg-light rounded-pill px-3">
+                    <option>Last 30 Days</option>
+                    <option>Last 6 Months</option>
+                </select>
+            </div>
+            <canvas id="productionChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="glass-card p-4 mb-4" data-aos="fade-left">
+            <h4 class="fw-bold mb-3">Quick Actions</h4>
+            <div class="list-group list-group-flush">
+                <a href="/products/add"
+                    class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-plus-lg fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Register Harvest</div>
+                        <small class="text-muted">Add a new organic crop batch</small>
+                    </div>
+                </a>
+                <a href="/exit-products/add"
+                    class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center mt-2">
+                    <div class="bg-info text-white rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-send-fill fs-4 text-white"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Ship Batch</div>
+                        <small class="text-muted">Transfer to Distributor</small>
+                    </div>
+                </a>
+                <a href="/track-food"
+                    class="list-group-item list-group-item-action border-0 px-0 d-flex align-items-center mt-2">
+                    <div class="bg-dark text-white rounded-circle p-3 me-3 d-flex justify-content-center align-items-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-search fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold">Audit History</div>
+                        <small class="text-muted">Trace any past shipment</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="glass-card p-4" data-aos="fade-left" data-aos-delay="100">
+            <div class="d-flex align-items-center gap-3">
+                <div class="flex-shrink-0 bg-success text-white rounded p-3">
+                    <i class="bi bi-patch-check-fill fs-3"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0">Organic Certified</h5>
+                    <small class="text-muted">Valid until Dec 2026</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('productionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            datasets: [{
+                label: 'Harvest Volume (Kg)',
+                data: [120, 190, 300, 250, 420, 310],
+                borderColor: '#2ecc71',
+                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+</script>
+{% endblock %}

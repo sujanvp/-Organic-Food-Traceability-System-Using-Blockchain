@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Retailer Dashboard - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-banner::after {
+        content: '\F54E';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 10rem;
+        opacity: 0.1;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .inventory-bg {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .sales-bg {
+        background: #e8f5e9;
+        color: #1b5e20;
+    }
+
+    .stock-alert {
+        border-left: 4px solid #e74c3c;
+        background: #fdf2f2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="welcome-banner glass-card">
+            <h1 class="display-5 fw-bold mb-2">Storefront Manager</h1>
+            <p class="lead opacity-75">Your bridge between the supply chain and the customer. Track your inventory and
+                organic sales.</p>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-icon inventory-bg"><i class="bi bi-box-seam"></i></div>
+            <h5 class="text-muted mb-1">Available Inventory</h5>
+            <h2 class="fw-bold">{{ stats.get('inventory', 0) }} Products</h2>
+            <div class="progress mt-3" style="height: 8px;">
+                <div class="progress-bar bg-warning" style="width: 65%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="glass-card p-4 h-100" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-icon sales-bg"><i class="bi bi-cart-check"></i></div>
+            <h5 class="text-muted mb-1">Moved Today</h5>
+            <h2 class="fw-bold">{{ stats.get('used_today', 0) }} Units</h2>
+            <p class="small text-success mt-2"><i class="bi bi-graph-up"></i> +12% from yesterday</p>
+        </div>
+    </div>
+
+    <!-- Retail Actions -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100" data-aos="fade-right">
+            <h4 class="fw-bold mb-4">Store Operations</h4>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-4 hover-shadow transition h-100">
+                        <i class="bi bi-boxes fs-1 text-primary mb-3 d-block"></i>
+                        <h5 class="fw-bold">Stock Audit</h5>
+                        <p class="text-muted small">View all received products and their blockchain origins.</p>
+                        <a href="/exit-products" class="btn btn-primary rounded-pill w-100 mt-3">View Inventory</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-4 hover-shadow transition h-100">
+                        <i class="bi bi-tag-fill fs-1 text-success mb-3 d-block"></i>
+                        <h5 class="fw-bold">Log Sale</h5>
+                        <p class="text-muted small">Record items sold or moved to update the public ledger.</p>
+                        <a href="/used-today/add" class="btn btn-success rounded-pill w-100 mt-3">Register Move</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <h5 class="fw-bold mb-3">Customer Traceability Terminal</h5>
+                <div class="p-3 bg-light rounded-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="fs-2 text-dark"><i class="bi bi-qr-code-scan"></i></div>
+                        <div>
+                            <div class="fw-bold">Transparency Hub</div>
+                            <div class="text-muted small">Let customers scan to see farm details</div>
+                        </div>
+                    </div>
+                    <a href="/track-food" class="btn btn-dark rounded-pill">Open Tracker</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="glass-card p-4 mb-4" data-aos="fade-left">
+            <h5 class="fw-bold mb-4">Stock Insights</h5>
+            <canvas id="inventoryChart" height="250"></canvas>
+        </div>
+
+        <div class="glass-card p-4 border-start border-4 border-warning" data-aos="fade-left" data-aos-delay="100">
+            <h6 class="fw-bold mb-2">Low Stock Alert</h6>
+            <div class="d-flex justify-content-between mb-1">
+                <span class="small">Organic Honey</span>
+                <span class="badge bg-danger">2 units left</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const ctx = document.getElementById('inventoryChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Honey', 'Grains', 'Vegetables', 'Fruits'],
+            datasets: [{
+                label: 'Stock Level',
+                data: [12, 45, 30, 15],
+                backgroundColor: '#e67e22',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}

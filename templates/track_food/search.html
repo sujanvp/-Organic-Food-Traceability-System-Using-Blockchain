@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}Seed to Table - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80');
+        background-size: cover;
+        background-position: center;
+        padding: 100px 0;
+        border-radius: 30px;
+        color: white;
+        margin-bottom: -50px;
+    }
+
+    .search-box-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+        transform: translateY(-50%);
+    }
+
+    .search-input-group {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 10px;
+        border-radius: 50px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .search-input-group input {
+        border: none;
+        background: transparent;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        flex-grow: 1;
+    }
+
+    .search-input-group input:focus {
+        outline: none;
+    }
+
+    .search-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 40px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .search-btn:hover {
+        background: var(--primary-dark);
+        transform: scale(1.05);
+    }
+
+    .filter-pill {
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid #eee;
+    }
+
+    .filter-pill:hover,
+    .filter-pill.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .result-card {
+        transition: all 0.3s;
+        border: 1px solid #eee;
+        overflow: hidden;
+    }
+
+    .result-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container pb-5">
+    <!-- Hero Section -->
+    <div class="search-hero text-center" data-aos="fade-down">
+        <h1 class="display-3 fw-bold mb-3">Transparency by Design</h1>
+        <p class="lead mb-0 opacity-75">Trace the entire journey of your food from farm to fork using blockchain.</p>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-box-container" data-aos="fade-up" data-aos-delay="200">
+        <div class="search-input-group align-items-center">
+            <input type="text" id="productSearch" placeholder="Enter Product Name or Certification ID..."
+                autocomplete="off" class="border-0 bg-transparent flex-grow-1 px-3">
+            <button type="button" class="btn btn-light rounded-circle p-2 mx-2 text-primary" data-bs-toggle="modal" data-bs-target="#qrScannerModal" title="Scan QR Code" style="width: 45px; height: 45px;">
+                <i class="bi bi-qr-code-scan"></i>
+            </button>
+            <button class="search-btn m-1" onclick="searchProducts()">
+                <i class="bi bi-search me-2"></i> Trace Now
+            </button>
+        </div>
+
+        <div class="d-flex justify-content-center gap-2 mt-4 flex-wrap">
+            <span class="filter-pill badge rounded-pill bg-white text-dark px-3 py-2 active">All Categories</span>
+            <span class="filter-pill badge rounded-pill bg-white text-dark px-3 py-2">Fresh Produce</span>
+            <span class="filter-pill badge rounded-pill bg-white text-dark px-3 py-2">Dairy & Eggs</span>
+            <span class="filter-pill badge rounded-pill bg-white text-dark px-3 py-2">Grains & Pulses</span>
+            <span class="filter-pill badge rounded-pill bg-white text-dark px-3 py-2">Organic Certified</span>
+        </div>
+    </div>
+
+    <!-- Results Area -->
+    <div class="row pt-5 mt-5">
+        <div class="col-12 px-0">
+            <div id="searchResults" class="row g-4">
+                <!-- Initial view: Featured Products or placeholder -->
+                <div class="col-12 text-center py-5 opacity-50" id="initialState">
+                    <i class="bi bi-search fs-1 mb-3 d-block"></i>
+                    <h4>Begin your search to reveal the story behind your food.</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="productTemplate">
+    <div class="col-md-4 product-item" data-aos="fade-up">
+        <div class="glass-card result-card h-100 p-0 overflow-hidden">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1 product-name"></h5>
+                        <span class="badge bg-light text-primary border product-type"></span>
+                    </div>
+                </div>
+                <div class="small text-muted mb-4">
+                    <div class="mb-1"><i class="bi bi-calendar-check me-2"></i>Added: <span class="product-date"></span>
+                    </div>
+                    <div class="mb-1"><i class="bi bi-shield-check me-2"></i>Cert: <span class="product-cert"></span>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-outline-primary w-100 rounded-pill fw-bold trace-link">
+                    Explore Journey <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- QR Scanner Modal -->
+<div class="modal fade" id="qrScannerModal" tabindex="-1" aria-labelledby="qrScannerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card border-0">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-primary" id="qrScannerModalLabel"><i class="bi bi-qr-code-scan me-2"></i>Scan Product QR</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="text-muted small mb-3">Align the QR code within the frame to trace.</p>
+        <div id="reader" style="width: 100%; border-radius: 15px; overflow: hidden; border: 2px dashed var(--primary);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+
+<script>
+    let searchTimeout;
+    let html5QrcodeScanner = null;
+
+    const qrScannerModal = document.getElementById('qrScannerModal');
+    if (qrScannerModal) {
+        qrScannerModal.addEventListener('shown.bs.modal', function () {
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "reader",
+                    { fps: 10, qrbox: {width: 250, height: 250} },
+                    /* verbose= */ false);
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            }
+        });
+
+        qrScannerModal.addEventListener('hidden.bs.modal', function () {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(error => {
+                    console.error("Failed to clear html5QrcodeScanner. ", error);
+                });
+                html5QrcodeScanner = null;
+            }
+        });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
+        var modal = bootstrap.Modal.getInstance(qrScannerModal);
+        if (modal) modal.hide();
+
+        if(decodedText.includes('/track-food/product/')) {
+            window.location.href = decodedText;
+        } else {
+            document.getElementById('productSearch').value = decodedText;
+            searchProducts();
+        }
+    }
+
+    function onScanFailure(error) {
+        // Ignore code scan error
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchQuery = urlParams.get('search') || urlParams.get('q');
+        if (searchQuery) {
+            document.getElementById('productSearch').value = searchQuery;
+            searchProducts();
+        }
+    });
+
+    document.getElementById('productSearch').addEventListener('input', function () {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchProducts();
+        }, 300);
+    });
+
+    function searchProducts() {
+        const query = document.getElementById('productSearch').value.trim();
+        const resultsContainer = document.getElementById('searchResults');
+
+        if (query === '') {
+            resultsContainer.innerHTML = document.getElementById('initialState').outerHTML;
+            return;
+        }
+
+        fetch(`/track-food/search?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                resultsContainer.innerHTML = '';
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-question-circle fs-1 text-muted d-block mb-3"></i>
+                    <p class="text-muted">No verified products found matching "${query}"</p>
+                </div>
+            `;
+                    return;
+                }
+
+                const template = document.getElementById('productTemplate');
+                data.forEach((product, index) => {
+                    const clone = template.content.cloneNode(true);
+                    clone.querySelector('.product-name').textContent = product.name;
+                    clone.querySelector('.product-type').textContent = product.type;
+                    clone.querySelector('.product-date').textContent = product.date;
+                    clone.querySelector('.product-cert').textContent = product.cert || 'Pending';
+                    clone.querySelector('.trace-link').href = `/track-food/product/${product.id}`;
+                    clone.querySelector('.product-item').style.transitionDelay = `${index * 50}ms`;
+                    resultsContainer.appendChild(clone);
+                });
+            });
+    }
+</script>
+{% endblock %}

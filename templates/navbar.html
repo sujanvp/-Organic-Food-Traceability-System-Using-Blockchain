@@ -1,0 +1,129 @@
+<nav class="navbar navbar-expand-lg navbar-light sticky-top navbar-glass py-3">
+    <style>
+        .navbar-glass {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .navbar-glass.scrolled {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #27ae60 0%, #1abc9c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link-custom {
+            font-weight: 600;
+            color: #444 !important;
+            padding: 8px 16px !important;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .nav-link-custom:hover {
+            background: rgba(39, 174, 96, 0.05);
+            color: #27ae60 !important;
+        }
+
+        .btn-profile-pill {
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-profile-pill:hover {
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            color: #27ae60;
+        }
+
+        .btn-logout-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff0f0;
+            color: #ff4757;
+            border: 1px solid #ffecec;
+            transition: all 0.3s;
+        }
+
+        .btn-logout-icon:hover {
+            background: #ff4757;
+            color: white;
+            transform: rotate(90deg);
+        }
+    </style>
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+            <i class="bi bi-shield-check-fill me-2 fs-3"></i>
+            <span>Organic Food Traceability</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-list fs-2"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item">
+                    <a class="nav-link-custom nav-link" href="/dashboard"><i
+                            class="bi bi-grid-1x2-fill me-2"></i>Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom nav-link" href="/track-food"><i class="bi bi-search me-2"></i>Trace
+                        Journey</a>
+                </li>
+                {% if session.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link-custom nav-link" href="/admin/users"><i class="bi bi-people-fill me-2"></i>Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-custom nav-link" href="/admin/transactions"><i class="bi bi-list-columns me-2"></i>Transactions</a>
+                </li>
+                {% endif %}
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <a class="btn-profile-pill" href="/profile">
+                    <div class="bg-primary-light text-primary rounded-circle small d-flex align-items-center justify-content-center"
+                        style="width: 24px; height: 24px;">
+                        <i class="bi bi-person-fill" style="font-size: 0.8rem;"></i>
+                    </div>
+                    <span>{{ user[1] if user else 'Profile' }}</span>
+                </a>
+                <a class="btn-logout-icon" href="/logout" title="Exit Session">
+                    <i class="bi bi-power"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    window.addEventListener('scroll', function () {
+        if (window.scrollY > 50) {
+            document.querySelector('.navbar-glass').classList.add('scrolled');
+        } else {
+            document.querySelector('.navbar-glass').classList.remove('scrolled');
+        }
+    });
+</script>

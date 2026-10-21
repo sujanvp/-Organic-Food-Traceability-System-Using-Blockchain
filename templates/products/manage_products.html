@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Products - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-card {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+    .product-grid-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-grid-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(46, 204, 113, 0.1) !important;
+    }
+
+    .filter-bar {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-inactive {
+        background: #fdf2f2;
+        color: #e74c3c;
+    }
+
+    .status-processing {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="header-card glass-card d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Product Inventory</h1>
+                <p class="mb-0 opacity-75">Manage your organic offerings and tracking status.</p>
+            </div>
+            <a href="/products/add" class="btn btn-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+                <i class="bi bi-plus-lg me-2"></i> New Product
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="col-12">
+        <div class="glass-card filter-bar">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label small fw-bold text-muted">Search Inventory</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i
+                                class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0 rounded-end-pill"
+                            placeholder="Name or Batch ID...">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label small fw-bold text-muted">Category</label>
+                    <select id="typeFilter" class="form-select rounded-pill">
+                        <option value="">All Categories</option>
+                        <option value="vegetable">Vegetable</option>
+                        <option value="fruit">Fruit</option>
+                        <option value="grain">Grain</option>
+                        <option value="dairy">Dairy</option>
+                        <option value="processed">Processed</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label small fw-bold text-muted">Status</label>
+                    <select id="statusFilter" class="form-select rounded-pill">
+                        <option value="">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Processing">Processing</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <button onclick="clearFilters()"
+                        class="btn btn-light w-100 rounded-pill border fw-bold">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-12">
+        <div id="productsContainer" class="row g-4">
+            {% if products %}
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6 product-item" data-aos="zoom-in" data-aos-delay="{{ loop.index * 50 }}">
+                <div class="glass-card product-grid-card p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="status-badge status-{{ product[5]|lower }}">
+                            <i class="bi bi-dot"></i> {{ product[5] }}
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-circle" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                                <li><a class="dropdown-item" href="/products/{{ product[0] }}/edit"><i
+                                            class="bi bi-pencil me-2"></i> Edit</a></li>
+                                <li><button class="dropdown-item text-danger"
+                                        onclick="deleteProduct({{ product[0] }})"><i class="bi bi-trash me-2"></i>
+                                        Delete</button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="fw-bold mb-1">{{ product[1] }}</h4>
+                    <p class="text-muted small mb-4"><i class="bi bi-tag-fill me-1"></i> {{ product[2] if product[2]
+                        else 'General' }}</p>
+
+                    <div class="bg-light rounded-3 p-3 mb-4 flex-grow-1">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Batch ID</small>
+                                <span class="fw-bold small">#{{ product[0]|string|zfill(5) }}</span>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Cert No</small>
+                                <span class="fw-bold small">{{ product[6] or 'N/A' }}</span>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <small class="text-muted d-block">Current Stock</small>
+                                <span class="fw-bold text-primary">{{ product[7] }} {{ product[8] or '' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/products/{{ product[0] }}" class="btn btn-outline-primary w-100 rounded-pill fw-bold">
+                        View Details <i class="bi bi-chevron-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <div class="bg-light d-inline-flex p-4 rounded-circle mb-4">
+                    <i class="bi bi-box2 fs-1 text-muted"></i>
+                </div>
+                <h3 class="fw-bold">No Products Found</h3>
+                <p class="text-muted">You haven't added any products to your inventory yet.</p>
+                <a href="/products/add" class="btn btn-primary rounded-pill px-5">Add Product</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const products = {{ products| tojson }};
+
+    document.getElementById('searchInput').addEventListener('input', performSearch);
+    document.getElementById('typeFilter').addEventListener('change', performSearch);
+    document.getElementById('statusFilter').addEventListener('change', performSearch);
+
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+
+        document.querySelectorAll('.product-item').forEach((item, index) => {
+            const product = products[index];
+            const nameMatch = product[1].toLowerCase().includes(query);
+            const typeMatch = !typeFilter || (product[2] && product[2].toLowerCase() === typeFilter);
+            const statusMatch = !statusFilter || product[5].toLowerCase() === statusFilter;
+
+            if (nameMatch && typeMatch && statusMatch) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    function clearFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('typeFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        performSearch();
+    }
+
+    function deleteProduct(productId) {
+        if (confirm('Delete this product from your inventory? This cannot be undone.')) {
+            fetch(`/products/${productId}/delete`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) location.reload();
+                    else alert('Error deleting product');
+                });
+        }
+    }
+</script>
+{% endblock %}

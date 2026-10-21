@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .result-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+    }
+
+    .result-card:hover {
+        transform: translateY(-10px);
+        border-color: var(--primary);
+        box-shadow: 0 20px 40px rgba(46, 204, 113, 0.1) !important;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 5px 12px;
+        border-radius: 50px;
+    }
+
+    .status-entry {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .status-exit {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="/track-food" class="text-decoration-none">Search</a></li>
+                    <li class="breadcrumb-item active">Results</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">Search Results</h2>
+            <p class="text-muted small">Showing results for "{{ search_value }}"</p>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-primary rounded-pill px-3">{{ products|length }} Found</span>
+        </div>
+    </div>
+
+    {% if products %}
+    {% for product in products %}
+    <div class="col-md-4 col-sm-6" data-aos="zoom-in" data-aos-delay="{{ loop.index * 50 }}">
+        <div class="glass-card result-card p-4 h-100 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="bg-primary-light text-primary p-2 rounded-3">
+                    <i class="bi bi-box-seam fs-4"></i>
+                </div>
+                <span class="status-badge {{ 'status-entry' if product[3] == 'Entry' else 'status-exit' }}">
+                    {{ product[3] }}
+                </span>
+            </div>
+
+            <h4 class="fw-bold mb-1 text-dark">{{ product[1] }}</h4>
+            <p class="text-muted small mb-4">{{ product[2] }}</p>
+
+            <div class="mt-auto">
+                <div class="d-flex justify-content-between small text-muted mb-3">
+                    <span><i class="bi bi-calendar-event me-1"></i> {{ product[4] }}</span>
+                    <span>ID: #{{ product[0] }}</span>
+                </div>
+                <a href="/track-food/product/{{ product[0] }}" class="btn btn-primary w-100 rounded-pill fw-bold">
+                    Trace Journey <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="col-12 text-center py-5" data-aos="fade-up">
+        <div class="mb-4">
+            <i class="bi bi-search-heart text-muted opacity-25" style="font-size: 5rem;"></i>
+        </div>
+        <h3 class="fw-bold text-dark">No Products Found</h3>
+        <p class="text-muted mb-4">We couldn't find any products matching your search criteria. Try a different term or
+            batch ID.</p>
+        <a href="/track-food" class="btn btn-outline-primary rounded-pill px-5">Try Again</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

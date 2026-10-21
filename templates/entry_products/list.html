@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Entry Product Listing - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-card {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+    .table-container {
+        overflow: hidden;
+        border-radius: 20px;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: var(--dark);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        padding: 20px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .table td {
+        padding: 20px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    .search-pill {
+        background: white;
+        border-radius: 50px;
+        padding: 5px 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #eee;
+    }
+
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="header-card glass-card d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Intake Registry</h1>
+                <p class="mb-0 opacity-75">Tracking products as they enter the verified supply chain.</p>
+            </div>
+            <a href="/entry-products/add" class="btn btn-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+                <i class="bi bi-plus-circle me-2"></i> Record Intake
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="col-12">
+        <div class="glass-card p-3 mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group search-pill">
+                        <span class="input-group-text bg-transparent border-0"><i
+                                class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="searchProduct" class="form-control border-0 bg-transparent"
+                            placeholder="Filter by Name...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group search-pill">
+                        <span class="input-group-text bg-transparent border-0"><i
+                                class="bi bi-calendar-event text-muted"></i></span>
+                        <input type="date" id="filterDate" class="form-control border-0 bg-transparent">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group search-pill">
+                        <span class="input-group-text bg-transparent border-0"><i
+                                class="bi bi-person text-muted"></i></span>
+                        <input type="text" id="filterUser" class="form-control border-0 bg-transparent"
+                            placeholder="Filter by User...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="col-12">
+        <div class="glass-card table-container">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product Details</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Timestamp</th>
+                            <th>Logged By</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="intakeTable">
+                        {% for product in products %}
+                        <tr class="product-row" data-product="{{ product[1]|lower }}" data-date="{{ product[4] }}"
+                            data-user="{{ product[5]|lower if product[5] else '' }}">
+                            <td>
+                                <div class="fw-bold">{{ product[1] }}</div>
+                                <div class="small text-muted">Intake ID: #{{ product[0] }}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark rounded-pill px-3">{{ product[2] }}</span></td>
+                            <td class="fw-bold">{{ product[3] }}</td>
+                            <td class="small">{{ product[4] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary-light text-primary rounded-circle small d-flex align-items-center justify-content-center"
+                                        style="width: 24px; height: 24px;">
+                                        <i class="bi bi-person-fill" style="font-size: 0.7rem;"></i>
+                                    </div>
+                                    <span class="small">{{ product[5] or 'System' }}</span>
+                                </div>
+                            </td>
+                            <td><span class="status-badge"><i class="bi bi-check-circle-fill me-1"></i> {{ product[6]
+                                    }}</span></td>
+                            <td>
+                                <a href="/entry-products/{{ product[0] }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    View Trace
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                                <h6 class="text-muted">No intake records found for this period.</h6>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const filterTable = () => {
+        const productSearch = document.getElementById('searchProduct').value.toLowerCase();
+        const dateFilter = document.getElementById('filterDate').value;
+        const userFilter = document.getElementById('filterUser').value.toLowerCase();
+
+        document.querySelectorAll('.product-row').forEach(row => {
+            const product = row.getAttribute('data-product');
+            const date = row.getAttribute('data-date');
+            const user = row.getAttribute('data-user');
+
+            const matchProduct = product.includes(productSearch);
+            const matchDate = !dateFilter || date.includes(dateFilter);
+            const matchUser = user.includes(userFilter);
+
+            row.style.display = matchProduct && matchDate && matchUser ? '' : 'none';
+        });
+    };
+
+    document.getElementById('searchProduct').addEventListener('input', filterTable);
+    document.getElementById('filterDate').addEventListener('change', filterTable);
+    document.getElementById('filterUser').addEventListener('input', filterTable);
+</script>
+{% endblock %}

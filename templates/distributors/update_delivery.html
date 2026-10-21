@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Delivery Update - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delivery-hero {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px 20px 0 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-aos="zoom-in">
+    <div class="col-lg-8 px-0">
+        <div class="glass-card shadow-lg border-0 overflow-hidden">
+            <div class="delivery-hero">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="bg-white text-warning rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">Delivery Status</h2>
+                </div>
+                <p class="mb-0 opacity-75 small">Recording transit update for Shipment #{{ shipment_id if shipment_id
+                    else 'N/A' }}</p>
+            </div>
+
+            <div class="p-4 p-md-5 bg-white">
+                <form id="deliveryForm" onsubmit="submitDelivery(event)">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <select class="form-select fw-bold" id="status" name="status" required>
+                                    <option value="">Select status...</option>
+                                    <option value="In Transit">🚚 In Transit</option>
+                                    <option value="Out for Delivery">📍 Out for Delivery</option>
+                                    <option value="Delivered">✅ Delivered</option>
+                                    <option value="Delivery Failed">❌ Delivery Failed</option>
+                                    <option value="Delayed">⏳ Delayed</option>
+                                </select>
+                                <label for="status">Current Progress</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="location" name="location"
+                                    placeholder="City">
+                                <label for="location">Current Physical Location (City/Hub)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="recipient_name" name="recipient_name"
+                                    placeholder="Name">
+                                <label for="recipient_name">Recipient Name (Signatory)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="delivery_proof" name="delivery_proof"
+                                    placeholder="Proof">
+                                <label for="delivery_proof">Proof Type (e.g. Photo, OTP)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check form-switch bg-light p-3 rounded-4 ps-5">
+                                <input class="form-check-input" type="checkbox" id="signature_required"
+                                    name="signature_required">
+                                <label class="form-check-label fw-bold" for="signature_required">Physical Signature
+                                    Verified</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <textarea class="form-control" id="remarks" name="remarks" style="height: 100px"
+                                    placeholder="Remarks"></textarea>
+                                <label for="remarks">Logistics Remarks / Issues</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="shipment_id" name="shipment_id"
+                        value="{{ shipment_id if shipment_id else '' }}">
+
+                    <div class="mt-5 d-flex gap-3">
+                        <a href="/shipments/{{ shipment_id if shipment_id else 0 }}"
+                            class="btn btn-light rounded-pill px-4 fw-bold">Discard</a>
+                        <button type="submit"
+                            class="btn btn-warning rounded-pill px-5 py-3 fw-bold shadow-sm flex-grow-1 text-white">
+                            Update Manifest & Notify Stakeholders <i class="bi bi-broadcast ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitDelivery(event) {
+        event.preventDefault();
+        const formData = new FormData(document.getElementById('deliveryForm'));
+
+        fetch('/update-delivery', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Delivery record synchronized with blockchain.');
+                    window.location.href = '/shipments/' + formData.get('shipment_id');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+    }
+</script>
+{% endblock %}

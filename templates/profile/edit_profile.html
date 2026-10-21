@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-card {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 40px;
+    }
+
+    .form-floating>label {
+        padding-left: 20px;
+    }
+
+    .form-control {
+        border-radius: 15px;
+        padding: 1.2rem 1.25rem;
+        border: 2px solid #f0f0f0;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ddd;
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="glass-card edit-card" data-aos="fade-up">
+    <div class="text-center mb-5">
+        <div class="bg-primary-light text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 80px; height: 80px;">
+            <i class="bi bi-person-gear fs-1"></i>
+        </div>
+        <h2 class="fw-bold">Edit Profile</h2>
+        <p class="text-muted">Update your account information.</p>
+    </div>
+
+    <form method="POST">
+        <div class="mb-4 position-relative">
+            <div class="form-floating">
+                <input type="text" class="form-control" id="name" name="name" value="{{ user[1] }}" placeholder="Name"
+                    required>
+                <label for="name">Full Name</label>
+            </div>
+            <i class="bi bi-person input-icon"></i>
+        </div>
+
+        <div class="mb-5 position-relative">
+            <div class="form-floating">
+                <input type="email" class="form-control bg-light" id="email" value="{{ user[2] }}" placeholder="Email"
+                    readonly>
+                <label for="email">Email Address (Fixed)</label>
+            </div>
+            <i class="bi bi-envelope-check input-icon"></i>
+            <small class="text-muted mt-2 d-block"><i class="bi bi-info-circle me-1"></i> Email is tied to your
+                blockchain identity.</small>
+        </div>
+
+        <div class="d-grid gap-3">
+            <button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold shadow-sm">
+                Save Changes <i class="bi bi-check-circle ms-2"></i>
+            </button>
+            <a href="/profile" class="btn btn-light border rounded-pill py-3 fw-bold">
+                Discard Changes
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

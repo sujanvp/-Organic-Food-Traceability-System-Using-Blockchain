@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Distributor Dashboard - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .welcome-banner::after {
+        content: '\F5D1';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 10rem;
+        opacity: 0.1;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .shipments-bg {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .transit-bg {
+        background: #e1f5fe;
+        color: #0288d1;
+    }
+
+    .delivered-bg {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .map-placeholder {
+        background: #f8f9fa;
+        border-radius: 20px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #dee2e6;
+        color: #adb5bd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="welcome-banner glass-card">
+            <h1 class="display-5 fw-bold mb-2">Logistics Control</h1>
+            <p class="lead opacity-75">Ensuring organic integrity during transit. Manage your delivery network and
+                storage conditions.</p>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-icon shipments-bg"><i class="bi bi-box-seam"></i></div>
+            <h5 class="text-muted mb-1">Total Shipments</h5>
+            <h2 class="fw-bold">{{ total_shipments or stats.get('received', 0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-icon transit-bg"><i class="bi bi-truck"></i></div>
+            <h5 class="text-muted mb-1">In Transit</h5>
+            <h2 class="fw-bold">{{ in_transit or (stats.get('received', 0) - stats.get('distributed', 0)) if stats else
+                0 }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="glass-card p-4 h-100" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-icon delivered-bg"><i class="bi bi-check2-all"></i></div>
+            <h5 class="text-muted mb-1">Delivered</h5>
+            <h2 class="fw-bold">{{ delivered or stats.get('distributed', 0) }}</h2>
+        </div>
+    </div>
+
+    <!-- Logistics Actions -->
+    <div class="col-lg-7">
+        <div class="glass-card p-4 h-100" data-aos="fade-right">
+            <h4 class="fw-bold mb-4">Shipment Operations</h4>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-4 hover-shadow transition h-100 d-flex flex-column">
+                        <i class="bi bi-box-arrow-in-right fs-2 text-primary mb-3"></i>
+                        <h5 class="fw-bold">Acceptance</h5>
+                        <p class="small text-muted flex-grow-1">Verify and receive new stock from farmers.</p>
+                        <a href="/accept-shipment" class="btn btn-sm btn-primary rounded-pill mt-2 w-fit">New
+                            Shipment</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-4 hover-shadow transition h-100 d-flex flex-column">
+                        <i class="bi bi-geo-alt-fill fs-2 text-danger mb-3"></i>
+                        <h5 class="fw-bold">Dispatch</h5>
+                        <p class="small text-muted flex-grow-1">Assign drivers and vehicles to deliveries.</p>
+                        <a href="/add-transport?shipment_id=0"
+                            class="btn btn-sm btn-outline-danger rounded-pill mt-2 w-fit">Dispatch Truck</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-4 hover-shadow transition h-100 d-flex flex-column">
+                        <i class="bi bi-thermometer-half fs-2 text-info mb-3"></i>
+                        <h5 class="fw-bold">Cold Chain</h5>
+                        <p class="small text-muted flex-grow-1">Log temperature and storage conditions.</p>
+                        <a href="/add-storage?shipment_id=0"
+                            class="btn btn-sm btn-outline-info rounded-pill mt-2 w-fit">Record Storage</a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 border rounded-4 hover-shadow transition h-100 d-flex flex-column">
+                        <i class="bi bi-pin-map-fill fs-2 text-success mb-3"></i>
+                        <h5 class="fw-bold">Status Hub</h5>
+                        <p class="small text-muted flex-grow-1">Update delivery location and milestone status.</p>
+                        <a href="/update-delivery?shipment_id=0"
+                            class="btn btn-sm btn-outline-success rounded-pill mt-2 w-fit">Update Status</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="glass-card p-4 h-100" data-aos="fade-left">
+            <h4 class="fw-bold mb-4">Transit Overview</h4>
+            <div class="map-placeholder">
+                <div class="text-center">
+                    <i class="bi bi-map fs-1 d-block mb-2"></i>
+                    <span>Live Tracking (Coming Soon)</span>
+                </div>
+            </div>
+            <div class="mt-4">
+                <h6 class="fw-bold small text-muted text-uppercase mb-3">Active Deliveries</h6>
+                <div class="d-flex align-items-center gap-3 mb-3 p-2 bg-light rounded-3">
+                    <div class="bg-white p-2 rounded"><i class="bi bi-truck text-primary"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small">SHIP-29384</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">In Transit - Central Hub</div>
+                    </div>
+                    <span class="badge bg-primary-light text-primary">80%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

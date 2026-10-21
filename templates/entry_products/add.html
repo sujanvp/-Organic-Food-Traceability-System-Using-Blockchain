@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Entry Product - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        color: white;
+        padding: 50px 30px;
+        border-radius: 20px;
+        margin-bottom: -50px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-card {
+        max-width: 800px;
+        margin: 0 auto 50px;
+        padding: 80px 40px 40px;
+        position: relative;
+        z-index: 0;
+    }
+
+    .form-floating>label {
+        padding-left: 20px;
+    }
+
+    .form-control {
+        border-radius: 15px;
+        border: 2px solid #f0f0f0;
+        padding: 1.1rem 1.25rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.1);
+    }
+
+    .input-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ddd;
+        z-index: 10;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" data-aos="fade-up">
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="/entry-products" class="btn btn-link text-decoration-none text-muted p-0 small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Intakes
+            </a>
+        </div>
+    </div>
+
+    <div class="form-hero glass-card text-center shadow-lg">
+        <h1 class="fw-bold mb-2">New <span class="text-white">Intake Entry</span></h1>
+        <p class="mb-0 opacity-75">Record raw materials as they enter the verified supply chain.</p>
+    </div>
+
+    <div class="glass-card form-card shadow-lg">
+        <form method="POST">
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="product_name" name="product_name" placeholder="Name"
+                            required>
+                        <label for="product_name">Product Name *</label>
+                        <i class="bi bi-box-seam input-icon"></i>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select class="form-select" id="product_type" name="product_type" required>
+                            <option value="">Select type</option>
+                            <option value="vegetable">Vegetable</option>
+                            <option value="fruit">Fruit</option>
+                            <option value="grain">Grain</option>
+                            <option value="dairy">Dairy</option>
+                        </select>
+                        <label for="product_type">Category *</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating position-relative">
+                        <input type="number" class="form-control" id="quantity" name="quantity" required step="0.01"
+                            placeholder="Quantity">
+                        <label for="quantity">Quantity *</label>
+                        <i class="bi bi-hash input-icon"></i>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="unit" name="unit" placeholder="Unit" required>
+                        <label for="unit">Unit (e.g., kg, lbs) *</label>
+                        <i class="bi bi-rulers input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-floating position-relative">
+                        <input type="text" class="form-control" id="certification_no" name="certification_no"
+                            placeholder="Cert No">
+                        <label for="certification_no">Organic Certification No.</label>
+                        <i class="bi bi-patch-check-fill input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea class="form-control" id="description" name="description" placeholder="Description"
+                            style="height: 120px"></textarea>
+                        <label for="description">Additional Notes / Batch Info</label>
+                    </div>
+                </div>
+
+                <div class="col-12 mt-5">
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill py-3 fw-bold shadow-sm">
+                            <i class="bi bi-clipboard-plus me-2"></i> Register Intake Entry
+                        </button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <p class="small text-muted"><i class="bi bi-shield-lock me-1"></i> Data will be signed and
+                            hashed for the ledger.</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

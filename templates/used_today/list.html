@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Usage History - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-card {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+    .table-container {
+        overflow: hidden;
+        border-radius: 20px;
+    }
+
+    .table thead th {
+        background: #f8f9fa;
+        color: var(--dark);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        padding: 20px;
+    }
+
+    .table td {
+        padding: 20px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="header-card glass-card d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Consumption Log</h1>
+                <p class="mb-0 opacity-75">Tracking daily product movement and final usage.</p>
+            </div>
+            <a href="/used-today/add" class="btn btn-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+                <i class="bi bi-plus-circle me-2"></i> Log New Movement
+            </a>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="col-12">
+        <div class="glass-card table-container shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product Detail</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Recorded On</th>
+                            <th>Origin Source</th>
+                            <th>Trace</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark">{{ product[1] }}</div>
+                                <div class="small text-muted">ID: #{{ product[0] }}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark rounded-pill">{{ product[2] }}</span></td>
+                            <td class="fw-bold text-primary">{{ product[3] }}</td>
+                            <td class="small">{{ product[4] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-primary-light text-primary rounded-circle small d-flex align-items-center justify-content-center"
+                                        style="width: 24px; height: 24px;">
+                                        <i class="bi bi-geo-alt" style="font-size: 0.7rem;"></i>
+                                    </div>
+                                    <span class="small">{{ product[6] or 'Local Store' }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/used-today/{{ product[0] }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+                                    View Source
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-basket-fill fs-1 text-muted d-block mb-3"></i>
+                                <h6 class="text-muted">No usage logs found for today.</h6>
+                                <p class="small text-muted">Start by adding a product you've used or sold.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

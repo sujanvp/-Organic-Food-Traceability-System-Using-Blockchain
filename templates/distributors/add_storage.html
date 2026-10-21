@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Environment Log - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .storage-hero {
+        background: linear-gradient(135deg, #8b5cf6 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px 20px 0 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-aos="zoom-in">
+    <div class="col-lg-8 px-0">
+        <div class="glass-card shadow-lg border-0 overflow-hidden">
+            <div class="storage-hero">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="bg-white text-info rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-thermometer-half"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">Storage Conditions</h2>
+                </div>
+                <p class="mb-0 opacity-75 small">Environmental monitoring for Shipment #{{ shipment_id if shipment_id
+                    else 'N/A' }}</p>
+            </div>
+
+            <div class="p-4 p-md-5 bg-white">
+                <form id="storageForm" onsubmit="submitStorage(event)">
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="warehouse_location"
+                                    name="warehouse_location" placeholder="Loc" required>
+                                <label for="warehouse_location">Warehouse Checkpoint / Zone ID</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <select class="form-select" id="storage_type" name="storage_type" required>
+                                    <option value="">Select type...</option>
+                                    <option value="Ambient">Ambient</option>
+                                    <option value="Cold Storage">Cold Storage</option>
+                                    <option value="Frozen">Frozen</option>
+                                    <option value="In Transit">In Transit</option>
+                                </select>
+                                <label for="storage_type">Facility Type</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <input type="number" class="form-control" id="temperature" name="temperature" step="0.1"
+                                    placeholder="Temp">
+                                <label for="temperature">Temp (°C)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-floating mb-1">
+                                <input type="number" class="form-control" id="humidity" name="humidity" step="0.1"
+                                    placeholder="Hum">
+                                <label for="humidity">Humidity (%)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <select class="form-select" id="light_conditions" name="light_conditions">
+                                    <option value="">Select light...</option>
+                                    <option value="Dark">UV Protected (Dark)</option>
+                                    <option value="Low Light">Low Light</option>
+                                    <option value="Normal">Normal Exposure</option>
+                                </select>
+                                <label for="light_conditions">Light Exposure</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <select class="form-select" id="ventilation_status" name="ventilation_status">
+                                    <option value="">Select air...</option>
+                                    <option value="Excellent">Active Airflow</option>
+                                    <option value="Adequate">Standard</option>
+                                    <option value="Sealed">Sealed Environment</option>
+                                </select>
+                                <label for="ventilation_status">Air Quality / Ventilation</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <textarea class="form-control" id="notes" name="notes" style="height: 100px"
+                                    placeholder="Notes"></textarea>
+                                <label for="notes">Condition Summary & Anomalies</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="shipment_id" name="shipment_id"
+                        value="{{ shipment_id if shipment_id else '' }}">
+
+                    <div class="mt-5 d-flex gap-3">
+                        <a href="/shipments/{{ shipment_id if shipment_id else 0 }}"
+                            class="btn btn-light rounded-pill px-4 fw-bold">Discard</a>
+                        <button type="submit"
+                            class="btn btn-info rounded-pill px-5 py-3 fw-bold shadow-sm flex-grow-1 text-white">
+                            Seal Environmental Record <i class="bi bi-shield-check ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitStorage(event) {
+        event.preventDefault();
+        const formData = new FormData(document.getElementById('storageForm'));
+
+        fetch('/add-storage', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Environmental telemetry snapshot recorded to blockchain.');
+                    window.location.href = '/shipments/' + formData.get('shipment_id');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+    }
+</script>
+{% endblock %}

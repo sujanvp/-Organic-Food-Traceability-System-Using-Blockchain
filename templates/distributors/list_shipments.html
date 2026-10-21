@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Logistics Hub - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .logistics-banner {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+
+    .status-accepted {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .status-in-transit {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .status-delivered {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="logistics-banner glass-card d-flex justify-content-between align-items-center shadow-lg">
+            <div>
+                <h1 class="display-6 fw-bold mb-1">Fleet Management</h1>
+                <p class="mb-0 opacity-75">Real-time tracking of organic product distribution across the network.</p>
+            </div>
+            <a href="/accept-shipment" class="btn btn-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+                <i class="bi bi-truck me-2"></i> Accept Shipment
+            </a>
+        </div>
+    </div>
+
+    <!-- Active Shipments -->
+    <div class="col-12">
+        <div class="glass-card shadow-sm p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Shipment # & Product</th>
+                            <th>Farmer</th>
+                            <th>Departure</th>
+                            <th>Est. Delivery</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if shipments %}
+                        {% for shipment in shipments %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ shipment[2] or 'Organic Goods' }}</div>
+                                <div class="small text-muted">Manifest: {{ shipment[1] }}</div>
+                            </td>
+                            <td>
+                                <span class="small"><i class="bi bi-building me-1"></i> {{ shipment[6] or 'Farm'
+                                    }}</span>
+                            </td>
+                            <td class="small">{{ shipment[4] }}</td>
+                            <td class="small fw-bold">{{ shipment[5] }}</td>
+                            <td>
+                                <span class="status-badge status-{{ shipment[3].lower().replace(' ', '-') }}">
+                                    {{ shipment[3] }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="/shipments/{{ shipment[0] }}"
+                                    class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="bi bi-geo-alt-fill me-1"></i> Track
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <i class="bi bi-truck-flatbed fs-1 text-muted d-block mb-3"></i>
+                                <h6 class="text-muted">No active shipments in your ledger.</h6>
+                                <p class="small text-muted">Connect with farmers to start distribution.</p>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - OrganicTrace{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <!-- Welcome Header -->
+    <div class="col-12">
+        <div class="glass-card" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 40px; border-radius: 20px; text-align: center;">
+            <h1 class="display-5 fw-bold mb-2">Admin Control Center</h1>
+            <p class="lead opacity-75">Maintain system security, oversee user registrations, and monitor blockchain transactions across the supply chain.</p>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="col-md-3">
+        <div class="glass-card p-4 h-100 text-center" data-aos="fade-up" data-aos-delay="100">
+            <h5 class="text-muted mb-1">Total Users</h5>
+            <h2 class="fw-bold">{{ stats.get('total_users', 0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-4 h-100 text-center" data-aos="fade-up" data-aos-delay="200">
+            <h5 class="text-muted mb-1">Pending Approvals</h5>
+            <h2 class="fw-bold text-warning">{{ stats.get('pending_users', 0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-4 h-100 text-center" data-aos="fade-up" data-aos-delay="300">
+            <h5 class="text-muted mb-1">Products Listed</h5>
+            <h2 class="fw-bold text-success">{{ stats.get('total_products', 0) }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card p-4 h-100 text-center" data-aos="fade-up" data-aos-delay="400">
+            <h5 class="text-muted mb-1">Supply Chain Transactions</h5>
+            <h2 class="fw-bold text-primary">{{ stats.get('total_transactions', 0) }}</h2>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-12 mt-5">
+        <h4 class="fw-bold mb-4">Quick Actions</h4>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="p-4 border rounded-4 bg-white shadow-sm d-flex flex-column h-100">
+                    <i class="bi bi-people-fill fs-1 text-primary mb-3"></i>
+                    <h5 class="fw-bold">User Management</h5>
+                    <p class="text-muted small flex-grow-1">Review new registrations, approve legitimate companies and farmers, block suspicious actors to keep the chain secure.</p>
+                    <a href="/admin/users" class="btn btn-outline-primary mt-2">Manage Users</a>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="p-4 border rounded-4 bg-white shadow-sm d-flex flex-column h-100">
+                    <i class="bi bi-list-columns-reverse fs-1 text-success mb-3"></i>
+                    <h5 class="fw-bold">Blockchain & Ledger Monitoring</h5>
+                    <p class="text-muted small flex-grow-1">View the immutable ledger. Audit transaction activities by analyzing entry, exit, and packaging logs from all actors.</p>
+                    <a href="/admin/transactions" class="btn btn-outline-success mt-2">View Transactions</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

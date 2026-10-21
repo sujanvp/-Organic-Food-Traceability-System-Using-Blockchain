@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}View Product - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-details-card {
+        max-width: 800px;
+        margin: 40px auto;
+        overflow: hidden;
+    }
+
+    .product-hero {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        padding: 60px 40px;
+        color: white;
+        position: relative;
+    }
+
+    .product-hero::after {
+        content: '\F52A';
+        font-family: 'bootstrap-icons';
+        position: absolute;
+        right: 40px;
+        bottom: 20px;
+        font-size: 8rem;
+        opacity: 0.1;
+    }
+
+    .detail-item {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 15px;
+        height: 100%;
+        border-left: 4px solid var(--primary);
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 15px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-inactive {
+        background: #fdf2f2;
+        color: #e74c3c;
+    }
+
+    .status-processing {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4" data-aos="fade-up">
+    <div class="col-12 text-start">
+        <a href="/products" class="btn btn-link text-decoration-none text-muted p-0">
+            <i class="bi bi-arrow-left me-1"></i> Back to Inventory
+        </a>
+    </div>
+
+    <div class="col-12">
+        <div class="glass-card product-details-card shadow-lg">
+            <div class="product-hero">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="status-pill status-{{ product[5]|lower }}">
+                        <i class="bi bi-circle-fill" style="font-size: 0.5rem;"></i> {{ product[5] }}
+                    </span>
+                    <span class="badge bg-white text-primary rounded-pill px-3">Batch #{{ product[0]|string|zfill(5)
+                        }}</span>
+                </div>
+                <h1 class="display-5 fw-bold mb-1">{{ product[1] }}</h1>
+                <p class="lead mb-0 opacity-75">{{ product[2] if product[2] else 'General Product' }}</p>
+            </div>
+
+            <div class="p-4 p-md-5">
+                <div class="row g-4 mb-5">
+                    <div class="col-md-6" data-aos="fade-right" data-aos-delay="100">
+                        <div class="detail-item">
+                            <div class="detail-label">Organic Certification</div>
+                            <div class="detail-value">{{ product[6] or 'Not Certified' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" data-aos="fade-left" data-aos-delay="200">
+                        <div class="detail-item">
+                            <div class="detail-label">Current Quantity</div>
+                            <div class="detail-value">{{ product[7] }} {{ product[8] or '' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" data-aos="fade-right" data-aos-delay="300">
+                        <div class="detail-item">
+                            <div class="detail-label">Registration Date</div>
+                            <div class="detail-value">{{ product[4] }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" data-aos="fade-left" data-aos-delay="400">
+                        <div class="detail-item">
+                            <div class="detail-label">Registered By</div>
+                            <div class="detail-value">{{ product[9] or 'System' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-light p-4 rounded-4 mb-5">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i> Product Provenance</h6>
+                    <p class="text-muted mb-0">This product is part of the immutable organic traceability chain. Every
+                        movement is recorded and verified on the public ledger to ensure total transparency from soil to
+                        shelf.</p>
+                </div>
+
+                <div class="d-flex gap-3">
+                    <a href="/products/{{ product[0] }}/edit"
+                        class="btn btn-primary flex-grow-1 rounded-pill py-3 fw-bold">
+                        <i class="bi bi-pencil-square me-2"></i> Edit Specifications
+                    </a>
+                    <a href="/track-food/product/{{ product[0] }}"
+                        class="btn btn-dark flex-grow-1 rounded-pill py-3 fw-bold">
+                        <i class="bi bi-share me-2"></i> View Blockchain Trace
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

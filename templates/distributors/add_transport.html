@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Transport Log - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transport-hero {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 20px 20px 0 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" data-aos="zoom-in">
+    <div class="col-lg-8 px-0">
+        <div class="glass-card shadow-lg border-0 overflow-hidden">
+            <div class="transport-hero">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style="width: 40px; height: 40px;">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h2 class="fw-bold mb-0">Transport Logistics</h2>
+                </div>
+                <p class="mb-0 opacity-75 small">Recording vehicle and route for Shipment #{{ shipment_id if shipment_id
+                    else 'N/A' }}</p>
+            </div>
+
+            <div class="p-4 p-md-5 bg-white">
+                <form id="transportForm" onsubmit="submitTransport(event)">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <select class="form-select" id="transport_mode" name="transport_mode" required>
+                                    <option value="">Select mode...</option>
+                                    <option value="Road">Road (Truck)</option>
+                                    <option value="Rail">Rail</option>
+                                    <option value="Air">Air Cargo</option>
+                                    <option value="Sea">Sea Freight</option>
+                                </select>
+                                <label for="transport_mode">Freight Mode</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number"
+                                    placeholder="VEH-001" required>
+                                <label for="vehicle_number">Vehicle Plate / Flight #</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="transporter_name" name="transporter_name"
+                                    placeholder="Transporter" required>
+                                <label for="transporter_name">Carrier Name (e.g. DHL, FedEx)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="driver_name" name="driver_name"
+                                    placeholder="Driver">
+                                <label for="driver_name">Operator / Pilot Name</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating mb-1">
+                                <input type="tel" class="form-control" id="driver_contact" name="driver_contact"
+                                    placeholder="Contact">
+                                <label for="driver_contact">Fleet Contact #</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <input type="text" class="form-control" id="route" name="route" placeholder="Route">
+                                <label for="route">Planned Transit Route</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating mb-1">
+                                <input type="datetime-local" class="form-control" id="estimated_arrival_time"
+                                    name="estimated_arrival_time">
+                                <label for="estimated_arrival_time">Projected Arrival Date/Time</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="shipment_id" name="shipment_id"
+                        value="{{ shipment_id if shipment_id else '' }}">
+
+                    <div class="mt-5 d-flex gap-3">
+                        <a href="/shipments/{{ shipment_id if shipment_id else 0 }}"
+                            class="btn btn-light rounded-pill px-4 fw-bold">Discard</a>
+                        <button type="submit"
+                            class="btn btn-primary rounded-pill px-5 py-3 fw-bold shadow-sm flex-grow-1">
+                            Verify & Dispatch <i class="bi bi-send-fill ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function submitTransport(event) {
+        event.preventDefault();
+        const formData = new FormData(document.getElementById('transportForm'));
+
+        fetch('/add-transport', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Transport details sealed and appended to shipment record.');
+                    window.location.href = '/shipments/' + formData.get('shipment_id');
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+    }
+</script>
+{% endblock %}

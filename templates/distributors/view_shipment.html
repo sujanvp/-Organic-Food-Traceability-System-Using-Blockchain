@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Shipment Track - OrganicTrace{% endblock %}
+
+{% block extra_css %}
+<style>
+    .shipment-hero {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        padding: 50px 40px;
+        color: white;
+    }
+
+    .info-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .shipment-stat {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        border-left: 4px solid #2ecc71;
+    }
+
+    .log-card {
+        border-radius: 12px;
+        border: 1px solid #eee;
+        transition: transform 0.2s;
+    }
+
+    .log-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" data-aos="fade-up">
+    <div class="row mb-3">
+        <div class="col-12 px-0">
+            <a href="/shipments" class="btn btn-link text-decoration-none text-muted p-0 small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Fleet
+            </a>
+        </div>
+    </div>
+
+    <div class="glass-card shadow-lg mb-5 overflow-hidden rounded-4">
+        <div class="shipment-hero">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <span class="info-badge">Shipment #{{ shipment[1] }}</span>
+                <span class="info-badge fw-bold"><i class="bi bi-truck me-1"></i> {{ shipment[9] }}</span>
+            </div>
+            <h1 class="display-5 fw-bold mb-1">Logistics Trail</h1>
+            <p class="lead opacity-75 mb-0">From {{ shipment[10] }} to {{ shipment[11] }}</p>
+        </div>
+
+        <div class="p-4 p-md-5">
+            <!-- Core Stats -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="shipment-stat">
+                        <small class="text-muted d-block text-uppercase fw-bold"
+                            style="font-size: 0.7rem;">Dispatched</small>
+                        <span class="fw-bold">{{ shipment[8] }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="shipment-stat">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Eta
+                            Destination</small>
+                        <span class="fw-bold">{{ shipment[6] }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="shipment-stat">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Source
+                            facility</small>
+                        <span class="fw-bold">{{ shipment[12] or 'Farmer' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-5">
+                <!-- Transport & Delivery -->
+                <div class="col-lg-7">
+                    <div class="mb-5">
+                        <h5 class="fw-bold mb-4 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-truck-flatbed me-2 text-success"></i> Transport Details</span>
+                            <a href="/add-transport?shipment_id={{ shipment[0] }}"
+                                class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                <i class="bi bi-pencil"></i> Update
+                            </a>
+                        </h5>
+                        {% if transport_details %}
+                        {% for detail in transport_details %}
+                        <div class="log-card p-3 mb-3 bg-white">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold text-dark">{{ detail[1] }}</span>
+                                <span class="text-muted small">{{ detail[2] }}</span>
+                            </div>
+                            <div class="small text-muted mb-2">
+                                <i class="bi bi-person-circle me-1"></i> Driver: {{ detail[4] }} | <i
+                                    class="bi bi-map me-1"></i> {{ detail[6] }}
+                            </div>
+                            <div class="p-2 bg-light rounded-3 small">
+                                <i class="bi bi-clock-history me-1"></i> Departed: {{ detail[7] }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="text-center py-4 bg-light rounded-4 border-dashed">
+                            <p class="text-muted small mb-0">No transport assignments recorded yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <h5 class="fw-bold mb-4 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-check-circle me-2 text-success"></i> Delivery History</span>
+                            <a href="/update-delivery?shipment_id={{ shipment[0] }}"
+                                class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                <i class="bi bi-plus"></i> Update
+                            </a>
+                        </h5>
+                        <div class="ms-2 border-start ps-4">
+                            {% if delivery_history %}
+                            {% for delivery in delivery_history %}
+                            <div class="position-relative mb-4">
+                                <div class="position-absolute start-0 top-0 bg-success rounded-circle"
+                                    style="width: 12px; height: 12px; transform: translateX(-40px) translateY(5px); border: 2px solid white;">
+                                </div>
+                                <div class="fw-bold text-dark small">{{ delivery[1] }}</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">{{ delivery[2] }} {{ delivery[3] }}
+                                    at {{ delivery[4] }}</div>
+                                {% if delivery[5] %}
+                                <div class="mt-2 p-2 rounded bg-light small"><i class="bi bi-person-fill"></i> Attn: {{
+                                    delivery[5] }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted small">Awaiting initial shipment update.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment & Ledger -->
+                <div class="col-lg-5">
+                    <div class="mb-5">
+                        <h5 class="fw-bold mb-4 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-thermometer-half me-2 text-success"></i> Transit Conditions</span>
+                            <a href="/add-storage?shipment_id={{ shipment[0] }}"
+                                class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                <i class="bi bi-plus"></i> Record
+                            </a>
+                        </h5>
+                        {% if storage_records %}
+                        <div class="list-group list-group-flush gap-2">
+                            {% for storage in storage_records %}
+                            <div class="list-group-item border rounded-4 px-3 py-3 shadow-sm bg-white">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold small">{{ storage[2] }}</span>
+                                    <span class="badge bg-light text-dark">{{ storage[7] }}</span>
+                                </div>
+                                <div class="row g-2 text-center">
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded small">
+                                            <div class="text-muted" style="font-size: 0.6rem;">TEMP</div>
+                                            <div class="fw-bold">{{ storage[3] }}°C</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-2 bg-light rounded small">
+                                            <div class="text-muted" style="font-size: 0.6rem;">HUMIDITY</div>
+                                            <div class="fw-bold">{{ storage[4] }}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4 bg-light rounded-4">
+                            <p class="text-muted small mb-0">No environmental logs found.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="glass-card p-4 bg-dark text-white border-0">
+                        <h6 class="fw-bold mb-3 d-flex align-items-center">
+                            <i class="bi bi-shield-lock-fill text-success me-2"></i>
+                            Blockchain Ledger
+                        </h6>
+                        <p class="small opacity-75 mb-4">Every logistics event is cryptographically sealed for
+                            end-to-end transparency.</p>
+                        <a href="/shipment-blockchain/{{ shipment[0] }}"
+                            class="btn btn-success w-100 rounded-pill py-2 fw-bold">
+                            View Immutable Log
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
