@@ -1,5 +1,5 @@
 # -Organic-Food-Traceability-System-Using-Blockchain
-🌱 Organic Food Traceability System Using Blockchain
+Organic Food Traceability System Using Blockchain
 Overview
 The Organic Food Traceability System Using Blockchain is a secure and transparent web application that enables tracking of organic food products throughout the supply chain. By integrating blockchain technology, the system ensures that every stage of the product lifecycle—from farming to the consumer—is recorded in an immutable ledger, improving transparency, authenticity, and consumer trust.
 
